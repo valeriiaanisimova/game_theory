@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теория игр: Стратегии и Равновесия</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c1424, #1a1a2e, #0c1424);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(101, 119, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6577ff, #5e17eb, #6577ff);
+            box-shadow: 0 0 15px rgba(101, 119, 255, 0.5);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(101, 119, 255, 0.7);
+            color: #ffffff;
+            background: linear-gradient(to right, #a78bfa, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #c7d2fe;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(101, 119, 255, 0.2);
+            border: 1px solid rgba(101, 119, 255, 0.3);
+        }
+        
+        .card h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #818cf8;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h2 i {
+            margin-right: 15px;
+            color: #a78bfa;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+        
+        .card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #d1d5db;
+        }
+        
+        .card ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .card li {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+        
+        .game-container {
+            grid-column: span 2;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: #818cf8;
+            text-shadow: 0 0 10px rgba(101, 119, 255, 0.3);
+        }
+        
+        .game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(20, 30, 48, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+        }
+        
+        .players {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .player {
+            text-align: center;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            width: 45%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .player:hover {
+            border: 1px solid rgba(101, 119, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(101, 119, 255, 0.2);
+        }
+        
+        .player h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+        
+        .player button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin: 8px 0;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .player button:hover {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.25);
+        }
+        
+        .player button.selected {
+            background: linear-gradient(to right, #f59e0b, #fbbf24);
+            color: #1e293b;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        
+        .results {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .results h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+        
+        .outcome {
+            background: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nash-equilibrium {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-top: 15px;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .example {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .example:hover {
+            transform: translateY(-5px);
+            border: 1px solid rgba(101, 119, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(101, 119, 255, 0.15);
+        }
+        
+        .example h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: #818cf8;
+        }
+        
+        .example p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+        
+        .math {
+            margin-top: 40px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+        }
+        
+        .math h2 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            color: #818cf8;
+            text-align: center;
+        }
+        
+        .math-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .math-text {
+            max-width: 600px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #d1d5db;
+        }
+        
+        .math-text p {
+            margin-bottom: 20px;
+        }
+        
+        .formula {
+            background: rgba(30, 41, 59, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #a78bfa;
+            font-family: 'Courier New', monospace;
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 1.1rem;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            color: #c7d2fe;
+            border: 1px solid rgba(101, 119, 255, 0.1);
+        }
+        
+        /* Добавленные стили */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            margin: 10px;
+            background: linear-gradient(to right, #1e293b, #334155);
+            border: 1px solid rgba(101, 119, 255, 0.2);
+            border-radius: 8px;
+            color: #c7d2fe;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 200px;
+            font-weight: 500;
+        }
+        
+        .tab-btn:hover {
+            background: linear-gradient(to right, #2d3748, #475569);
+            border: 1px solid rgba(101, 119, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(101, 119, 255, 0.2);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+            border: 1px solid rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .game-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .game-content.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .strategy-section {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+        }
+        
+        .strategy-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #818cf8;
+            text-align: center;
+        }
+        
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .strategy-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(101, 119, 255, 0.15);
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-7px);
+            background: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 12px 25px rgba(101, 119, 255, 0.15);
+            border: 1px solid rgba(101, 119, 255, 0.3);
+        }
+        
+        .strategy-card h3 {
+            color: #a78bfa;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .strategy-card h3 i {
+            margin-right: 10px;
+            width: 30px;
+            text-align: center;
+            color: #818cf8;
+        }
+        
+        .strategy-card p {
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+        
+        .theory-section {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(101, 119, 255, 0.1);
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(to bottom, #4f46e5, #7c3aed);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #1e293b;
+            border: 4px solid #7c3aed;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
+        
+        .timeline-item:nth-child(odd)::after {
+            right: -12px;
+        }
+        
+        .timeline-item:nth-child(even)::after {
+            left: -12px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(101, 119, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .timeline-content h3 {
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-content p {
+            color: #d1d5db;
+        }
+        
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .application-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(101, 119, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .application-card:hover {
+            transform: scale(1.03);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 10px 25px rgba(101, 119, 255, 0.2);
+            border: 1px solid rgba(101, 119, 255, 0.3);
+        }
+        
+        .application-card i {
+            font-size: 3rem;
+            color: #818cf8;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(101, 119, 255, 0.4);
+        }
+        
+        .application-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+        
+        .application-card p {
+            color: #d1d5db;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-container {
+                grid-column: span 1;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .players {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .player {
+                width: 100%;
+                max-width: 350px;
+                margin-bottom: 20px;
+            }
+            
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+            
+            .timeline-item:nth-child(odd)::after, 
+            .timeline-item:nth-child(even)::after {
+                left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Теория игр</h1>
+            <div class="subtitle">
+                Стратегии взаимодействия и принятия решений в условиях конфликта интересов
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="game-container">
+                <h2 class="game-title"><i class="fas fa-gamepad"></i> Игры</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="prisoner">Дилемма заключённого</button>
+                    <button class="tab-btn" data-tab="hawk-dove">Ястребы и Голуби</button>
+                    <button class="tab-btn" data-tab="battle">Битва полов</button>
+                </div>
+                
+                <div class="game-content active" id="prisoner-game">
+                    <div class="players">
+                        <div class="player">
+                            <h3>Игрок A</h3>
+                            <button id="cooperateA">Сотрудничать (3 года)</button>
+                            <button id="defectA">Предать (0 лет)</button>
+                        </div>
+                        <div class="player">
+                            <h3>Игрок B</h3>
+                            <button id="cooperateB">Сотрудничать (3 года)</button>
+                            <button id="defectB">Предать (0 лет)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="results">
+                        <h3>Результат</h3>
+                        <div class="outcome">
+                            <p>Выберите стратегии для обоих игроков</p>
+                            <p class="nash-equilibrium" id="nashIndicator"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-content" id="hawk-dove-game">
+                    <div class="players">
+                        <div class="player">
+                            <h3>Игрок A</h3>
+                            <button data-strategy="hawk">Ястреб (агрессия)</button>
+                            <button data-strategy="dove">Голубь (уступка)</button>
+                        </div>
+                        <div class="player">
+                            <h3>Игрок B</h3>
+                            <button data-strategy="hawk">Ястреб (агрессия)</button>
+                            <button data-strategy="dove">Голубь (уступка)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="results">
+                        <h3>Результат</h3>
+                        <div class="outcome">
+                            <p>Выберите стратегии для обоих игроков</p>
+                            <p class="nash-equilibrium" id="hawkNashIndicator"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-content" id="battle-game">
+                    <div class="players">
+                        <div class="player">
+                            <h3>Партнёр A</h3>
+                            <button data-strategy="football">Футбол</button>
+                            <button data-strategy="theater">Театр</button>
+                        </div>
+                        <div class="player">
+                            <h3>Партнёр B</h3>
+                            <button data-strategy="football">Футбол</button>
+                            <button data-strategy="theater">Театр</button>
+                        </div>
+                    </div>
+                    
+                    <div class="results">
+                        <h3>Результат</h3>
+                        <div class="outcome">
+                            <p>Выберите предпочтения для обоих партнёров</p>
+                            <p class="nash-equilibrium" id="battleNashIndicator"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="strategy-section">
+            <h2>Стратегии</h2>
+            <div class="strategy-grid">
+                <div class="strategy-card">
+                    <h3><i class="fas fa-chess-king"></i> Доминирующая стратегия</h3>
+                    <p>Стратегия, которая обеспечивает игроку максимальную выгоду независимо от действий оппонента.</p>
+                </div>
+                
+                <div class="strategy-card">
+                    <h3><i class="fas fa-balance-scale"></i> Равновесие Нэша</h3>
+                    <p>Ситуация, в которой ни один игрок не может увеличить свой выигрыш, изменив свою стратегию, пока другие игроки сохраняют свои стратегии. В битве полов есть два равновесия Нэша: оба идут на футбол или оба идут в театр.</p>
+                </div>
+                
+                <div class="strategy-card">
+                    <h3><i class="fas fa-handshake"></i> Парето-оптимум</h3>
+                    <p>Состояние, при котором невозможно улучшить положение одного игрока, не ухудшив положение другого. В дилемме заключенного сотрудничество обоих игроков является Парето-оптимальным, так как дает общий лучший результат.</p>
+                </div>
+                
+                <div class="strategy-card">
+                    <h3><i class="fas fa-infinity"></i> Повторяющиеся игры</h3>
+                    <p>Стратегии для игр, которые повторяются многократно. "Око за око" - известная стратегия, при которой игрок начинает с сотрудничества, а затем повторяет ход оппонента из предыдущего раунда.</p>
+                </div>
+                
+                <div class="strategy-card">
+                    <h3><i class="fas fa-chess"></i> Смешанная стратегия</h3>
+                    <p>Когда игрок выбирает стратегию случайным образом согласно определенному распределению вероятностей. В игре "Камень-ножницы-бумага" равновесие Нэша достигается при выборе каждой стратегии с вероятностью 1/3.</p>
+                </div>
+                
+                <div class="strategy-card">
+                    <h3><i class="fas fa-people-arrows"></i> Эволюционно стабильная стратегия</h3>
+                    <p>Стратегия, которая устойчива к вторжению мутантных стратегий в популяции. В игре "Ястребы и Голуби" смешанная стратегия является эволюционно стабильной.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="strategy-section">
+            <h2>Где использовать теорию игр в жизни?</h2>
+            <div class="applications-grid">
+                <div class="application-card">
+                    <i class="fas fa-handshake"></i>
+                    <h3>Переговоры</h3>
+                    <p>Анализируйте позиции сторон, определите зоны возможного соглашения и точки сопротивления. Используйте стратегии честности и взаимных уступок.</p>
+                </div>
+                
+                <div class="application-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Финансовые решения</h3>
+                    <p>При инвестировании учитывайте возможные действия других участников рынка. Избегайте "стадного поведения" и анализируйте равновесия на рынке.</p>
+                </div>
+                
+                <div class="application-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Работа в команде</h3>
+                    <p>Создавайте стимулы для сотрудничества, а не конкуренции внутри команды. Ясные правила и взаимные обязательства улучшают результаты.</p>
+                </div>
+                
+                <div class="application-card">
+                    <i class="fas fa-gavel"></i>
+                    <h3>Разрешение конфликтов</h3>
+                    <p>Ищите решения, где все стороны получают выгоду. Определите точки взаимных интересов и возможности для компромисса.</p>
+                </div>
+                
+                <div class="application-card">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Потребительское поведение</h3>
+                    <p>Анализируйте стратегии продавцов при выборе товаров. Ищите ситуации, где ваши интересы совпадают с интересами продавца.</p>
+                </div>
+                
+                <div class="application-card">
+                    <i class="fas fa-road"></i>
+                    <h3>Повседневные решения</h3>
+                    <p>При выборе маршрута учитывайте возможные действия других водителей. В переполненных местах ищите менее очевидные варианты.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 | Сайт по теории игр</p>
+        </footer>
+    </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Игроки для дилеммы заключенного
+            const prisonerPlayerA = {
+                cooperate: document.getElementById('cooperateA'),
+                defect: document.getElementById('defectA'),
+                strategy: null
+            };
+            
+            const prisonerPlayerB = {
+                cooperate: document.getElementById('cooperateB'),
+                defect: document.getElementById('defectB'),
+                strategy: null
+            };
+            
+            const outcomeElement = document.querySelector('#prisoner-game .outcome');
+            const nashIndicator = document.getElementById('nashIndicator');
+            
+            // Функция для обновления выбора игроков (дилемма заключенного)
+            function selectPrisonerStrategy(player, strategy) {
+                // Сброс предыдущего выбора
+                if (player.strategy) {
+                    player[player.strategy].classList.remove('selected');
+                }
+                
+                // Установка нового выбора
+                player.strategy = strategy;
+                player[strategy].classList.add('selected');
+                
+                // Проверка, сделаны ли оба выбора
+                if (prisonerPlayerA.strategy && prisonerPlayerB.strategy) {
+                    calculatePrisonerOutcome();
+                }
+            }
+            
+            // Выигрыши для "Дилеммы заключенного"
+            const prisonerPayoffs = {
+                cooperate_cooperate: { a: 3, b: 3 },
+                cooperate_defect: { a: 0, b: 5 },
+                defect_cooperate: { a: 5, b: 0 },
+                defect_defect: { a: 10, b: 10 }
+            };
+            
+            // Функция расчета результата (дилемма заключенного)
+            function calculatePrisonerOutcome() {
+                const strategy = `${prisonerPlayerA.strategy}_${prisonerPlayerB.strategy}`;
+                const payoff = prisonerPayoffs[strategy];
+                
+                let outcomeText = "";
+                
+                switch(strategy) {
+                    case "cooperate_cooperate":
+                        outcomeText = "Оба игрока сотрудничают. Игрок А получает 3 года, Игрок Б получает 3 года.";
+                        break;
+                    case "cooperate_defect":
+                        outcomeText = "Игрок А сотрудничает, Игрок Б предает. Игрок А получает 5 лет, Игрок Б освобождается.";
+                        break;
+                    case "defect_cooperate":
+                        outcomeText = "Игрок А предает, Игрок Б сотрудничает. Игрок А освобождается, Игрок Б получает 5 лет.";
+                        break;
+                    case "defect_defect":
+                        outcomeText = "Оба игрока предают. Игрок А получает 10 лет, Игрок Б получает 10 лет.";
+                        break;
+                }
+                
+                outcomeElement.innerHTML = `<p>${outcomeText}</p>`;
+                
+                // Проверка на равновесие Нэша
+                if (strategy === "defect_defect") {
+                    nashIndicator.textContent = "Это равновесие Нэша!";
+                } else {
+                    nashIndicator.textContent = "Это не равновесие Нэша.";
+                }
+            }
+            
+            // Назначение обработчиков событий (дилемма заключенного)
+            prisonerPlayerA.cooperate.addEventListener('click', () => selectPrisonerStrategy(prisonerPlayerA, 'cooperate'));
+            prisonerPlayerA.defect.addEventListener('click', () => selectPrisonerStrategy(prisonerPlayerA, 'defect'));
+            prisonerPlayerB.cooperate.addEventListener('click', () => selectPrisonerStrategy(prisonerPlayerB, 'cooperate'));
+            prisonerPlayerB.defect.addEventListener('click', () => selectPrisonerStrategy(prisonerPlayerB, 'defect'));
+            
+            // Инициализация игры с равновесием Нэша
+            selectPrisonerStrategy(prisonerPlayerA, 'defect');
+            selectPrisonerStrategy(prisonerPlayerB, 'defect');
+            
+            // Добавлен код для переключения вкладок
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const gameContents = document.querySelectorAll('.game-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Удаляем активный класс у всех кнопок и контента
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    gameContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Добавляем активный класс текущей кнопке
+                    btn.classList.add('active');
+                    
+                    // Показываем соответствующий контент
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-game`).classList.add('active');
+                });
+            });
+            
+            // Игра "Ястребы и Голуби"
+            const hawkDoveGame = {
+                playerA: null,
+                playerB: null,
+                outcomeElement: document.querySelector('#hawk-dove-game .outcome'),
+                nashIndicator: document.getElementById('hawkNashIndicator'),
+                buttonsA: document.querySelectorAll('#hawk-dove-game .player:nth-child(1) button'),
+                buttonsB: document.querySelectorAll('#hawk-dove-game .player:nth-child(2) button'),
+                
+                init: function() {
+                    this.buttonsA.forEach(btn => {
+                        btn.addEventListener('click', () => this.selectStrategy('A', btn.getAttribute('data-strategy')));
+                    });
+                    
+                    this.buttonsB.forEach(btn => {
+                        btn.addEventListener('click', () => this.selectStrategy('B', btn.getAttribute('data-strategy')));
+                    });
+                },
+                
+                selectStrategy: function(player, strategy) {
+                    if (player === 'A') {
+                        this.playerA = strategy;
+                        this.buttonsA.forEach(btn => {
+                            btn.classList.remove('selected');
+                            if (btn.getAttribute('data-strategy') === strategy) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    } else {
+                        this.playerB = strategy;
+                        this.buttonsB.forEach(btn => {
+                            btn.classList.remove('selected');
+                            if (btn.getAttribute('data-strategy') === strategy) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    }
+                    
+                    if (this.playerA && this.playerB) {
+                        this.calculateOutcome();
+                    }
+                },
+                
+                calculateOutcome: function() {
+                    let outcome = "";
+                    
+                    if (this.playerA === 'hawk' && this.playerB === 'hawk') {
+                        outcome = "Оба выбрали агрессию! Оба получают серьёзные травмы. Выигрыш: (-5, -5)";
+                    } else if (this.playerA === 'hawk' && this.playerB === 'dove') {
+                        outcome = "Ястреб побеждает Голубя! Ястреб получает ресурс целиком. Выигрыш: (5, 0)";
+                    } else if (this.playerA === 'dove' && this.playerB === 'hawk') {
+                        outcome = "Голубь уступает Ястребу! Ястреб получает ресурс целиком. Выигрыш: (0, 5)";
+                    } else {
+                        outcome = "Оба выбрали уступку! Ресурс делится поровну без конфликта. Выигрыш: (3, 3)";
+                    }
+                    
+                    this.outcomeElement.innerHTML = `<p>${outcome}</p>`;
+                    
+                    // Проверка на равновесие Нэша
+                    if ((this.playerA === 'hawk' && this.playerB === 'dove') || 
+                        (this.playerA === 'dove' && this.playerB === 'hawk')) {
+                        this.nashIndicator.textContent = "Это равновесие Нэша!";
+                    } else {
+                        this.nashIndicator.textContent = "Это не равновесие Нэша.";
+                    }
+                }
+            };
+            
+            // Инициализация игры
+            hawkDoveGame.init();
+            
+            // Игра "Битва полов"
+            const battleGame = {
+                playerA: null,
+                playerB: null,
+                outcomeElement: document.querySelector('#battle-game .outcome'),
+                nashIndicator: document.getElementById('battleNashIndicator'),
+                buttonsA: document.querySelectorAll('#battle-game .player:nth-child(1) button'),
+                buttonsB: document.querySelectorAll('#battle-game .player:nth-child(2) button'),
+                
+                init: function() {
+                    this.buttonsA.forEach(btn => {
+                        btn.addEventListener('click', () => this.selectStrategy('A', btn.getAttribute('data-strategy')));
+                    });
+                    
+                    this.buttonsB.forEach(btn => {
+                        btn.addEventListener('click', () => this.selectStrategy('B', btn.getAttribute('data-strategy')));
+                    });
+                },
+                
+                selectStrategy: function(player, strategy) {
+                    if (player === 'A') {
+                        this.playerA = strategy;
+                        this.buttonsA.forEach(btn => {
+                            btn.classList.remove('selected');
+                            if (btn.getAttribute('data-strategy') === strategy) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    } else {
+                        this.playerB = strategy;
+                        this.buttonsB.forEach(btn => {
+                            btn.classList.remove('selected');
+                            if (btn.getAttribute('data-strategy') === strategy) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    }
+                    
+                    if (this.playerA && this.playerB) {
+                        this.calculateOutcome();
+                    }
+                },
+                
+                calculateOutcome: function() {
+                    let outcome = "";
+                    
+                    if (this.playerA === 'football' && this.playerB === 'football') {
+                        outcome = "Оба идут на футбол! Партнёр A счастлив (выигрыш 3), Партнёр B доволен (выигрыш 1)";
+                    } else if (this.playerA === 'theater' && this.playerB === 'theater') {
+                        outcome = "Оба идут в театр! Партнёр B счастлив (выигрыш 3), Партнёр A доволен (выигрыш 1)";
+                    } else if (this.playerA === 'football' && this.playerB === 'theater') {
+                        outcome = "Каждый идёт на своё мероприятие! Оба несчастны (выигрыш 0, 0)";
+                    } else {
+                        outcome = "Каждый идёт на своё мероприятие! Оба несчастны (выигрыш 0, 0)";
+                    }
+                    
+                    this.outcomeElement.innerHTML = `<p>${outcome}</p>`;
+                    
+                    // Проверка на равновесие Нэша
+                    if ((this.playerA === 'football' && this.playerB === 'football') || 
+                        (this.playerA === 'theater' && this.playerB === 'theater')) {
+                        this.nashIndicator.textContent = "Это равновесие Нэша!";
+                    } else {
+                        this.nashIndicator.textContent = "Это не равновесие Нэша.";
+                    }
+                }
+            };
+            
+            // Инициализация игры
+            battleGame.init();
+        });
+    </script>
+</body>
+</html>
